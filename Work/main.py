@@ -4,5 +4,3 @@ import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
 
-print("PyTorch version:", torch.__version__)
-print("NumPy version:", np.__version__)
