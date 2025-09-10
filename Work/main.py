@@ -1,1 +1,7 @@
-print("Let's get started with the project!")
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import numpy as np
+
+print("PyTorch version:", torch.__version__)
