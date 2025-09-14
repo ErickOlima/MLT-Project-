@@ -2,6 +2,7 @@ import torch as t
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 import Rede_neural as rn
 
@@ -27,6 +28,8 @@ def plotagem_1d_modelo(xf, func, y_pred, y_true, loss, func_label, path):
     ax2.set_ylabel("loss")
     ax2.plot(range(4000), loss)
     fig.savefig(path)
+#dicionário com os erros de diversas situações
+dict_erros = {}
 
 #função
 func = lambda x: x ** 3
@@ -37,26 +40,55 @@ xa, xb = -4, 4
 x_true = xa + (xb-xa) * t.rand(number_samples, 1)
 y_true = func(x_true)
 
-model = rn.neural_net_interno_1_hidden([1, 20, 1]) # uma camada interna de 20]
-loss = model.treino(x_true, y_true)
+for activation_func in ("RelU", "sigmoid", "tanh"):
+    dict_erros[activation_func] = {}
 
-xf = np.linspace(-6, 6, 12)
-y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32))
+    # 1 hidden layer
+    for neuronios_1 in (5, 10, 15, 20, 25, 30):
+        model = rn.neural_net_interno_1_hidden([1, neuronios_1, 1], activation_func) # uma camada interna de 20]
+        loss = model.treino(x_true, y_true)
 
-error_measure = np.sum((func(xf)-y_pred.detach().numpy())**2)
-print(error_measure)
-'''
-fig, (ax, ax2) = plt.subplots(2,1, figsize = (7, 10))
-ax.plot(xf, func(xf), label = "y = x³")
-ax.plot(xf, y_pred.detach().numpy(), label = "dados previstos")
-ax.scatter(x_true, y_true, label = "valores de treinamento")
-ax.legend()
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax2.set_title("Evolução da perda")
-ax2.set_xlabel("epoch")
-ax2.set_ylabel("loss")
-ax2.plot(range(4000), loss)
-fig.savefig("Work\Ex1_graphs\Relu_hidden_1_20")
-'''
-plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³", "Work\Ex1_graphs\Relu_hidden1_20")
+        xf = np.linspace(-6, 6, 12)
+        y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32))
+
+        error_measure = np.sum((func(xf)-y_pred.detach().numpy())**2)
+        dict_erros[activation_func][neuronios_1] = error_measure
+
+        plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                            f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}")
+        
+    # 2 hidden layer
+    for neuronios_1 in (5, 10, 15, 20, 25, 30):
+        for neuronios_2 in (5, 10, 15, 20, 25, 30):
+            model = rn.neural_net_interno_2_hidden([1, neuronios_1, neuronios_2, 1], activation_func) # uma camada interna de 20]
+            loss = model.treino(x_true, y_true)
+
+            xf = np.linspace(-6, 6, 12)
+            y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32))
+
+            error_measure = np.sum((func(xf)-y_pred.detach().numpy())**2)
+            dict_erros[activation_func][(neuronios_1, neuronios_2)] = error_measure
+
+            plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                                f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}")
+
+    # 3 hidden layer
+    for neuronios_1 in (5, 10, 15, 20, 25, 30):
+        for neuronios_2 in (5, 10, 15, 20, 25, 30):
+            for neuronios_3 in (5, 10, 15, 20, 25, 30):
+                model = rn.neural_net_interno_2_hidden([1, neuronios_1, neuronios_2, neuronios_3, 1], activation_func) # uma camada interna de 20]
+                loss = model.treino(x_true, y_true)
+
+                xf = np.linspace(-6, 6, 12)
+                y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32))
+
+                error_measure = np.sum((func(xf)-y_pred.detach().numpy())**2)
+                dict_erros[activation_func][(neuronios_1, neuronios_2, neuronios_3)] = error_measure
+
+                plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                                    f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}_hidden3_{neuronios_3}")
+                
+#salvando erros
+dict_erros = json.dumps(dict_erros)
+with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+    print(dict_erros, file=file)
