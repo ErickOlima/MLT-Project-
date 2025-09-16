@@ -40,7 +40,7 @@ xa, xb = -4, 4
 x_true = xa + (xb-xa) * t.rand(number_samples, 1)
 y_true = func(x_true)
 
-for activation_func in ("RelU", "sigmoid", "tanh"):
+for activation_func in ("ReLU", "sigmoid", "tanh"):
     dict_erros[activation_func] = {}
 
     # 1 hidden layer
@@ -89,6 +89,6 @@ for activation_func in ("RelU", "sigmoid", "tanh"):
                                     f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}_hidden3_{neuronios_3}")
                 
 #salvando erros
-dict_erros = json.dumps(dict_erros)
-with open("Work\Ex1_graphs\Erros.txt", "w") as file:
-    print(dict_erros, file=file)
+#dict_erros = json.dumps(dict_erros)
+#with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+#    print(dict_erros, file=file)

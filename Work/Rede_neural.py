@@ -3,21 +3,21 @@ import torch.nn as nn
 import torch.optim as optim
 
 class neural_net_interno(nn.Module):
-    def __init__(self, activation_func = "RelU"):
+    def __init__(self, activation_func = "ReLU"):
         '''
         sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
         activation_func : função de ativação aplicada interiormente
         '''
         super(neural_net_interno, self).__init__()
 
-        if activation_func == "RelU":
+        if activation_func == "ReLU":
             self.func = nn.ReLU()
         elif activation_func == "sigmoid":
             self.func = nn.Sigmoid()
         elif activation_func == "tanh":
             self.func = nn.Tanh()
         else: 
-            raise NameError("função de ativação não definida")
+            raise NameError("função de ativação não encontrada ou não definida")
     
     def treino(self, x_true, y_true, learning_rate=0.01, number_epochs=4000, loss_func=nn.MSELoss(),
                   tipo = "Batch", optimize = "Adam", zerar_seed=False, Mini_batch_size = None):
@@ -67,7 +67,7 @@ class neural_net_interno(nn.Module):
         return train_loss_sum_vec
         
 class neural_net_interno_1_hidden(neural_net_interno):
-    def __init__(self, sizes:list, activation_func = "RelU", zerar_seed=False):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
         '''
         sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
         activation_func : função de ativação aplicada interiormente
@@ -87,7 +87,7 @@ class neural_net_interno_1_hidden(neural_net_interno):
         return x
     
 class neural_net_interno_2_hidden(neural_net_interno):
-    def __init__(self, sizes:list, activation_func = "RelU", zerar_seed=False):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
         '''
         sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
         activation_func : função de ativação aplicada interiormente
@@ -110,7 +110,7 @@ class neural_net_interno_2_hidden(neural_net_interno):
         return x
     
 class neural_net_interno_3_hidden(neural_net_interno):
-    def __init__(self, sizes:list, activation_func = "RelU", zerar_seed=False):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
         '''
         sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
         activation_func : função de ativação aplicada interiormente
@@ -136,7 +136,7 @@ class neural_net_interno_3_hidden(neural_net_interno):
         return x
     
 class neural_net_interno_4_hidden(neural_net_interno):
-    def __init__(self, sizes:list, activation_func = "RelU", zerar_seed=False):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
         '''
         sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
         activation_func : função de ativação aplicada interiormente
