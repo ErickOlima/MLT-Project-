@@ -54,7 +54,7 @@ activation_func_list = ("ReLU", "sigmoid", "tanh")
 neuronios_list = (5, 10, 15, 20, 25, 30)
 
 print(" ---- treinando e validando a rede ---- ")
-with tqdm.tqdm(total=len(activation_func_list) + len(neuronios_list)*(1+len(neuronios_list)*(1+len(neuronios_list)))) as pbar:
+with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuronios_list)*(1+len(neuronios_list)))) as pbar:
 
     # error_func = lambda y_true, y_pred = np.sum((func(xf)-y_pred.detach().numpy())**2)
     for activation_func in activation_func_list:
@@ -62,7 +62,7 @@ with tqdm.tqdm(total=len(activation_func_list) + len(neuronios_list)*(1+len(neur
 
         # 1 hidden layer
         for neuronios_1 in (5, 10, 15, 20, 25, 30):
-            model = rn.neural_net_interno_1_hidden([1, neuronios_1, 1], activation_func) # uma camada interna de 20]
+            model = rn.neural_net_interno_1_hidden([1, neuronios_1, 1], activation_func, zerar_seed=1) # uma camada interna de 20]
             loss = model.treino(x_true, y_true)
 
             y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
