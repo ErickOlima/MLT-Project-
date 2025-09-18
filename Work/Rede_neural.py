@@ -1,6 +1,7 @@
 import torch as t
 import torch.nn as nn
 import torch.optim as optim
+import copy
 
 class neural_net_interno(nn.Module):
     def __init__(self, activation_func = "ReLU"):
@@ -20,8 +21,11 @@ class neural_net_interno(nn.Module):
             raise NameError("função de ativação não encontrada ou não definida")
     
     def treino(self, x_true, y_true, learning_rate=0.01, number_epochs=4000, loss_func=nn.MSELoss(),
-                  tipo = "Batch", optimize = "Adam", zerar_seed=False, Mini_batch_size = None):
+                  tipo = "Batch", optimize = "Adam", zerar_seed=False, Mini_batch_size = None, seed =0):
         train_loss_sum_vec = []
+
+        if zerar_seed:
+            t.manual_seed(seed)
 
         if optimize == 'Adam':
             optimizer = optim.Adam(self.parameters(), lr = learning_rate)
@@ -65,7 +69,70 @@ class neural_net_interno(nn.Module):
             raise NameError("otimizador não definido")
         
         return train_loss_sum_vec
+    
+    def treino_validacao(self, x_train, y_train, x_val, y_val, learning_rate=0.01, number_epochs=4000,
+                         loss_func=nn.MSELoss(), tipo = "Batch", optimize = "Adam", zerar_seed=False,
+                          Mini_batch_size = None, seed = 0):
+        train_loss_sum_vec = []
+        val_loss_sum_vec = []
+        val_loss_min, val_loss_max = 10**100, 0
+
+        if zerar_seed:
+            t.manual_seed(seed)
+
+        if optimize == 'Adam':
+            optimizer = optim.Adam(self.parameters(), lr = learning_rate)
+
+            for epoch in range(number_epochs):
+                self.train() # permite ao programa treinar
+                train_loss_sum, val_loss_sum = 0, 0
+
+                if tipo == "Batch":
+                    # foward pass de treinamento
+                    y_pred = self.foward(x_train).squeeze()
+
+                    #determinação da perda
+                    loss = loss_func(y_pred, y_train.squeeze())
+                    train_loss_sum += loss.item()
+
+                    #backward automatic derivation
+                    optimizer.zero_grad() #zera os valores .grad calculados
+                    loss.backward() # cálculo do gradiente
+                    optimizer.step() #alteras os valores de pesos e bias
+
+                    #preparando o modelo para validação
+                    self.eval()
+                    with t.no_grad():
+                        # foward pass de validação
+                        y_pred = self.foward(x_val).squeeze()
+
+                        #determinação da perda
+                        loss = loss_func(y_pred, y_val.squeeze())
+                        val_loss_sum += loss.item()
+
+                elif tipo == "Non stocastic":
+                    raise NameError("tipo não implementado")
+
+                elif tipo == "Stocastic":
+                    raise NameError("tipo não implementado")
+                
+                elif tipo == "Minibatch":
+                    raise NameError("tipo não implementado")
+                
+                train_loss_sum_vec.append(train_loss_sum)
+                val_loss_sum_vec.append(val_loss_sum)
+                if val_loss_min > val_loss_sum:
+                    val_loss_min = val_loss_sum
+                    savestate = copy.deepcopy(self.state_dict())
+
+                if val_loss_max < val_loss_sum:
+                    val_loss_max = val_loss_sum
+        else:
+            # talvez definir para com lr fixo aqui?
+            raise NameError("otimizador não definido")
         
+        return train_loss_sum_vec, val_loss_sum_vec, val_loss_min, val_loss_max, savestate
+    
 class neural_net_interno_1_hidden(neural_net_interno):
     def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
         '''

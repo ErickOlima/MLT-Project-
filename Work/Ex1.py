@@ -8,10 +8,11 @@ import tqdm
 import Rede_neural as rn
 
 print(" ---- definido parâmetros ---- ")
-def plotagem_1d_modelo(xf, func, y_pred, y_true, loss, func_label, path):
+def plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, func_label, path):
     '''
     xf: intervalo onde plotar a função
     func: função exata
+    x_true: valores x de trainamento
     y_pred: valores preditos pelo modelo
     y_true: valores de treinamento
     loss: vetor com as perdas
@@ -70,7 +71,7 @@ with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuron
             error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
             dict_erros[activation_func][neuronios_1] = error_measure
 
-            plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+            plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
                                 f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}")
             pbar.update(1)
 
@@ -85,7 +86,7 @@ with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuron
                 error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
                 dict_erros[activation_func][f"{neuronios_1},{neuronios_2}"] = error_measure
 
-                plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
                                     f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}")
                 pbar.update(1)
         # 3 hidden layer
@@ -100,7 +101,7 @@ with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuron
                     error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
                     dict_erros[activation_func][f"{neuronios_1},{neuronios_2},{neuronios_3}"] = error_measure
 
-                    plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                    plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
                                         f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}_hidden3_{neuronios_3}")
                     pbar.update(1)
 
