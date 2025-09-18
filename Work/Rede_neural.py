@@ -2,6 +2,10 @@ import torch as t
 import torch.nn as nn
 import torch.optim as optim
 import copy
+import matplotlib.pyplot as plt
+from matplotlib import cm
+import numpy as np
+
 
 class neural_net_interno(nn.Module):
     def __init__(self, activation_func = "ReLU"):
@@ -230,3 +234,47 @@ class neural_net_interno_4_hidden(neural_net_interno):
         x = self.func(x)
         x = self.fc5(x)
         return x
+
+class plot_error():
+    def __init__(self, train_loss_sum_vec, path):
+        self.train_loss_sum_vec = train_loss_sum_vec
+        self.path = path
+        
+        plt.plot(range(len(train_loss_sum_vec)), train_loss_sum_vec)
+        plt.yscale('log')
+        plt.xscale('log')
+        plt.grid(True)
+        plt.show()
+
+
+class plt_3d_surface():
+    def __init__(self, model, xa, xb):
+        self.model = model
+        self.xa = xa
+        self.xb = xb
+
+    def plot(self):
+        grid_step = 50
+        xs = t.linspace(self.xa, self.xb, steps=grid_step)
+        ys = t.linspace(self.xa, self.xb, steps=grid_step)
+        xg,yg = t.meshgrid(xs, ys, indexing='xy')
+        s = xs.size(0)
+        xyg = t.zeros([s,s,2])
+
+        xyg[:,:,0] = xg
+        xyg[:,:,1] = yg
+
+        y_pred = self.model.forward(xyg)
+        y_pred = t.squeeze(y_pred)
+
+        y_true = self.func(xg, yg)
+
+        fig = plt.figure(figsize=(6, 6))
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(xg, yg, y_pred.detach().numpy(), vmin=0. * 2, cmap=cm.Blues, alpha=0.5,label='y pred (trained net)')
+        ax.plot_surface(xg, yg, y_true, vmin=0.0 * 2, cmap=cm.Reds, alpha=0.5,label='y true')
+        ax.set_xlabel('X1-axis')
+        ax.set_ylabel('X2-axis')
+        ax.set_zlabel('Y-axis')
+        ax.legend()
+        plt.show()

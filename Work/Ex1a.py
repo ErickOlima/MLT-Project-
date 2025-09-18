@@ -1,15 +1,14 @@
+print(" ---- importando dependências ---- ")
 import torch as t
 import random
 import numpy as np
 import matplotlib.pyplot as plt
 import json
-import torch.nn as nn
-import torch.optim as optim
+import tqdm
 import Rede_neural as rn
+import time as tm
 
-# Resolvendo o problema 1D de forma mais simples 
-
-
+print(" ---- definido parâmetros ---- ")
 def plotagem_1d_modelo(xf, func, y_pred, y_true, loss, func_label, path):
     '''
     xf: intervalo onde plotar a função
@@ -31,152 +30,124 @@ def plotagem_1d_modelo(xf, func, y_pred, y_true, loss, func_label, path):
     ax2.set_xlabel("epoch")
     ax2.set_ylabel("loss")
     ax2.plot(range(4000), loss)
-    fig.savefig(path)
-    #plt.plot.show()
+    plt.show()
+    #fig.savefig(path)
 
-class Net_1_hidden_layer(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size, activation_func):
+
+def melhor_modelo(erros):
+  for menor in erros:
+          if min(erros) == menor:
+            if model ==   rn.neural_net_interno_3_hidden([input_size, neuronios_1, neuronios_2, neuronios_3, output_size], activation_func):
+              plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                                          f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}_hidden3_{neuronios_3}")
+            if model == rn.neural_net_interno_2_hidden([input_size, neuronios_1, neuronios_2, output_size], activation_func):
+              plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                                          f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}")
+            if model == rn.neural_net_interno_1_hidden([input_size, neuronios_1, output_size], activation_func):
+              plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
+                                  f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}")
         
-        super(Net_1_hidden_layer, self).__init__()
-        
-        t.manual_seed(0)
-        
-        self.fc1 = nn.Linear(input_size, hidden_size)  # Fully connected layer 1
-        self.fc2 = nn.Linear(hidden_size, output_size) # Fully connected layer 2
-        
-        
-        if activation_func=='ReLU':
-          self.func = nn.ReLU()                         
-        elif activation_func=='sigmoid':
-          self.func = nn.Sigmoid()                      
-        elif activation_func=='tanh':
-          self.func = nn.Tanh()                         
-        else:
-          raise NameError('activation_func function ' + activation_func + ' not supported yet!')
-
-    
-    
-    def forward(self, x):
-        out = self.fc1(x)
-        out = self.func(out)
-        out = self.fc2(out)
-        return out
 
 
-# modelo ReLU 
-modelo_1 = { 
-    'input_size': 1,
-    'hidden_size': 20,
-    'output_size': 1,
-    'activation_func': 'ReLU'
-}
+#dicionário com os erros de diversas situações
+dict_erros = {}
 
-modelo_2 = { 
-    'input_size': 1,
-    'hidden_size_1': 30,
-    'hidden_size_2': 30,
-    'output_size': 1,
-    'activation_func': 'ReLU'
-}
-
-modelo_3 = {
-    'input_size': 1,
-    'hidden_size_1': 5,
-    'hidden_size_2': 5,
-    'hidden_size_3': 5,
-    'output_size': 1,
-    'activation_func': 'ReLU'
-}
-
-modelo_4 = { 
-    'input_size': 1,
-    'hidden_size_1': 10,
-    'hidden_size_2': 10,
-    'hidden_size_3': 10,
-    'hidden_size_4': 10,
-    'output_size': 1,
-    'activation_func': 'ReLU'
-}
-
-#model = rn.neural_net_interno_1_hidden([input_size, hidden_size, output_size], activation_func=func)
-model = Net_1_hidden_layer(*modelo_1.values())
-
-#função real a ser aproximada
+#função
 func = lambda x: x ** 3
+#amostras 
+number_samples = 20
+xa, xb = -4, 4
+#t.manual_seed(0)
+x_true = xa + (xb-xa) * t.rand(number_samples, 1)
+y_true = func(x_true)
 
-#amostras de treinamento
+#valores de validação
+xf = np.linspace(-6, 6, 12)
 
-samples_number = 20
-ax, bx = -4, 4
+#erro de função
+error_func = t.nn.MSELoss()
 
-#.manual_seed(0)  # controlar aleatoriedade
+# neuronios e funções de  ativação a testar
+activation_func_list = ("ReLU", "sigmoid", "tanh")
+neuronios_list = (5, 10)
 
-x_true = ax + (bx - ax) * t.rand(samples_number, 1)  # amostras de treinamento
-y_true = func(x_true)  # valores reais correspondentes
+print(" ---- treinando e validando a rede ---- ")
+total_1_hidden = len(neuronios_list)
+total_2_hidden = len(neuronios_list)**2
+total_3_hidden = len(neuronios_list)**3
+total_por_ativacao = total_1_hidden + total_2_hidden + total_3_hidden
+total_geral = len(activation_func_list) + total_por_ativacao
 
+with tqdm.tqdm(total=total_geral) as pbar:
 
-for activation_func in ("ReLU", "sigmoid", "tanh"):
-
-
-    # 1 hidden layer
-
-    model = rn.neural_net_interno_1_hidden([1, modelo_1['hidden_size'], 1], activation_func) # uma camada interna de 20]
-    loss = model.treino(x_true, y_true)
-
-    xf = np.linspace(-6, 6, 12)
-    y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32))
-
-    error_measure = np.sum((func(xf)-y_pred.detach().numpy())**2)
+    input_size = 1
+    output_size = 1
     
-    plotagem_1d_modelo(xf, func, y_pred, y_true, loss, "y = x³",
-                        f"Work\Ex1_graphs\{modelo_1['activation_func']}_hidden1_{modelo_1['hidden_size']}")
+    # error_func = lambda y_true, y_pred = np.sum((func(xf)-y_pred.detach().numpy())**2)
+    for activation_func in activation_func_list:
+        dict_erros[activation_func] = {}
+        begin = tm.time()
+        erros = []
+
+
+        # 1 hidden layer
+        for neuronios_1 in (5, 10):
+            model = rn.neural_net_interno_1_hidden([input_size, neuronios_1, output_size], activation_func) # uma camada interna de 20]
+            loss = model.treino(x_true, y_true)
+
+            y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
+
+            error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
+            dict_erros[activation_func][neuronios_1] = error_measure
+            erros.append(error_measure)
+
+            melhor_modelo(erros)
+          
+            pbar.update(1)
+
+        # 2 hidden layer
+        for neuronios_1 in neuronios_list:
+            for neuronios_2 in neuronios_list:
+                model = rn.neural_net_interno_2_hidden([input_size, neuronios_1, neuronios_2, output_size], activation_func) # uma camada interna de 20]
+                loss = model.treino(x_true, y_true)
+
+                y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
+
+                error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
+                dict_erros[activation_func][f"{neuronios_1},{neuronios_2}"] = error_measure
+                erros.append(error_measure)
+                
+                melhor_modelo(erros)
+                
+                pbar.update(1)
+        # 3 hidden layer
+        for neuronios_1 in neuronios_list:
+            for neuronios_2 in neuronios_list:
+                for neuronios_3 in neuronios_list:
+                    model = rn.neural_net_interno_3_hidden([input_size, neuronios_1, neuronios_2, neuronios_3, output_size], activation_func) # uma camada interna de 20]
+                    loss = model.treino(x_true, y_true)
+
+                    y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
+
+                    error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
+                    dict_erros[activation_func][f"{neuronios_1},{neuronios_2},{neuronios_3}"] = error_measure
+                    erros.append(error_measure)
+                    
+                    melhor_modelo(erros)
+                    
+                    pbar.update(1)
+
+        for erros in dict_erros[activation_func].items():
+            print(f"Função de Ativação: {activation_func}, Neurônios: {erros[0]}, Erro: {erros[1]}")
+        
+          
+        print(f"Tempo para função de ativação {activation_func}: {tm.time()-begin:.2f} segundos")
+        time = 0 
 
 
 
 
-
-
-
-
-
-
-"""
-samples_number = 20 
-ax, bx = -4, 4
-torch.manual_seed(0)
-
-x_true = ax + (bx - ax) * torch.rand(samples_number, modelo_1['input_size']) 
-y_true = x_true**3
-
-learning_rate = 0.01
-number_epochs = 4000
-
-loss_function = nn.MSELoss() 
-train_loss_sum_vec = [] 
-
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
-for epoch in range(number_epochs):
-  
-  model.train() 
-  
-  y_pred = model(x_true) 
-  
-  loss = loss_function(y_pred,y_true)
-  train_loss_sum = loss.item()
-  
-  
-  optimizer.zero_grad() 
-  loss.backward() 
-  optimizer.step() 
-  train_loss_sum_vec.append(train_loss_sum) 
-  
-y_pred = model.forward(x_true) 
-plt.plot(x_true,y_true,"*",label='y true (training data)')
-plt.plot(x_true,y_pred.detach().numpy(),"^",label='y pred (trained net)')
-plt.legend()
-plt.grid(True)
-plt.show()
-"""
-
-
+#print(" ---- salvando erros ---- ")
+#dict_erros = json.dumps(dict_erros)
+#with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+#    print(dict_erros, file=file)

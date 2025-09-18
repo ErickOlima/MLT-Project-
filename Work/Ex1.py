@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import json
 import tqdm
 import Rede_neural as rn
+import time as tm
 
 print(" ---- definido parâmetros ---- ")
 def plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, func_label, path):
@@ -30,7 +31,8 @@ def plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, func_label, path)
     ax2.set_xlabel("epoch")
     ax2.set_ylabel("loss")
     ax2.plot(range(4000), loss)
-    fig.savefig(path)
+    #fig.savefig(path)
+    #plt.show()
 
 #dicionário com os erros de diversas situações
 dict_erros = {}
@@ -55,11 +57,12 @@ activation_func_list = ("ReLU", "sigmoid", "tanh")
 neuronios_list = (5, 10, 15, 20, 25, 30)
 
 print(" ---- treinando e validando a rede ---- ")
-with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuronios_list)*(1+len(neuronios_list)))) as pbar:
-
+with tqdm.tqdm(total=len(activation_func_list) + len(neuronios_list)*(1+len(neuronios_list)*(1+len(neuronios_list)))) as pbar:
+    
     # error_func = lambda y_true, y_pred = np.sum((func(xf)-y_pred.detach().numpy())**2)
     for activation_func in activation_func_list:
         dict_erros[activation_func] = {}
+        begin = tm.time()
 
         # 1 hidden layer
         for neuronios_1 in (5, 10, 15, 20, 25, 30):
@@ -105,7 +108,12 @@ with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuron
                                         f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}_hidden3_{neuronios_3}")
                     pbar.update(1)
 
-print(" ---- salvando erros ---- ")
-dict_erros = json.dumps(dict_erros)
-with open("Work\Ex1_graphs\Erros.txt", "w") as file:
-    print(dict_erros, file=file)
+        for erros in dict_erros[activation_func].items():
+            print(f"Função de Ativação: {activation_func}, Neurônios: {erros[0]}, Erro: {erros[1]}")
+        
+        print(f"Tempo para função de ativação {activation_func}: {tm.time()-begin:.2f} segundos")
+
+#print(" ---- salvando erros ---- ")
+#dict_erros = json.dumps(dict_erros)
+#with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+#    print(dict_erros, file=file)
