@@ -34,9 +34,9 @@ error_func = t.nn.MSELoss()
 
 # neuronios e funções de  ativação a testar
 activation_func_list = ("ReLU", "sigmoid", "tanh")
-n_neuronios_inicial = 10
-passo_centrado = 20
-n_iterations = 2
+n_neuronios_inicial = 30
+passo_centrado = 1
+n_iterations = 20
 n_max_layers = 3
 n_max_neuronios_per_layer = 1000
 

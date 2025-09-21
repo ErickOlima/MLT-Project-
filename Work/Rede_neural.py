@@ -235,6 +235,73 @@ class neural_net_interno_4_hidden(neural_net_interno):
         x = self.fc5(x)
         return x
 
+class neural_net_interno_5_hidden(neural_net_interno):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
+        '''
+        sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
+        activation_func : função de ativação aplicada interiormente
+        '''
+        super().__init__(activation_func)
+        
+        if zerar_seed:
+            t.manual_seed(0)
+         
+        self.fc1 = nn.Linear(sizes[0], sizes[1])
+        self.fc2 = nn.Linear(sizes[1], sizes[2])
+        self.fc3 = nn.Linear(sizes[2], sizes[3])
+        self.fc4 = nn.Linear(sizes[3], sizes[4])
+        self.fc5 = nn.Linear(sizes[4], sizes[5])
+        self.fc6 = nn.Linear(sizes[5], sizes[6])
+
+    def foward(self, x):
+        x = self.fc1(x)
+        x = self.func(x)
+        x = self.fc2(x)
+        x = self.func(x)
+        x = self.fc3(x)
+        x = self.func(x)
+        x = self.fc4(x)
+        x = self.func(x)
+        x = self.fc5(x)
+        x = self.func(x)
+        x = self.fc6(x)
+        return x
+    
+class neural_net_interno_6_hidden(neural_net_interno):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
+        '''
+        sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
+        activation_func : função de ativação aplicada interiormente
+        '''
+        super().__init__(activation_func)
+        
+        if zerar_seed:
+            t.manual_seed(0)
+         
+        self.fc1 = nn.Linear(sizes[0], sizes[1])
+        self.fc2 = nn.Linear(sizes[1], sizes[2])
+        self.fc3 = nn.Linear(sizes[2], sizes[3])
+        self.fc4 = nn.Linear(sizes[3], sizes[4])
+        self.fc5 = nn.Linear(sizes[4], sizes[5])
+        self.fc6 = nn.Linear(sizes[5], sizes[6])
+        self.fc7 = nn.Linear(sizes[6], sizes[7])
+
+    def foward(self, x):
+        x = self.fc1(x)
+        x = self.func(x)
+        x = self.fc2(x)
+        x = self.func(x)
+        x = self.fc3(x)
+        x = self.func(x)
+        x = self.fc4(x)
+        x = self.func(x)
+        x = self.fc5(x)
+        x = self.func(x)
+        x = self.fc6(x)
+        x = self.func(x)
+        x = self.fc7(x)
+        return x
+    
 class plt_plot_general():
     def __init__(self, figsize = (8,24)):
         self.fig = plt.figure(figsize=figsize)
@@ -303,50 +370,6 @@ class plt_plot_general():
 
     def close(self):
         plt.close(self.fig)
-
-'''
-class plot_error():
-    def __init__(self, train_loss_sum_vec, path):
-        self.train_loss_sum_vec = train_loss_sum_vec
-        self.path = path
-        
-        plt.plot(range(len(train_loss_sum_vec)), train_loss_sum_vec)
-        plt.yscale('log')
-        plt.xscale('log')
-        plt.grid(True)
-        plt.show()
-
-class plt_3d_surface():
-    def __init__(self, model, xa, xb):
-        self.model = model
-        self.xa = xa
-        self.xb = xb
-
-    def plot(self):
-        grid_step = 50
-        xs = t.linspace(self.xa, self.xb, steps=grid_step)
-        ys = t.linspace(self.xa, self.xb, steps=grid_step)
-        xg,yg = t.meshgrid(xs, ys, indexing='xy')
-        s = xs.size(0)
-        xyg = t.zeros([s,s,2])
-
-        xyg[:,:,0] = xg
-        xyg[:,:,1] = yg
-
-        y_pred = self.model.forward(xyg)
-        y_pred = t.squeeze(y_pred)
-
-        y_true = self.func(xg, yg)
-
-        fig = plt.figure(figsize=(6, 6))
-        ax = fig.add_subplot(projection='3d')
-        ax.plot_surface(xg, yg, y_pred.detach().numpy(), vmin=0. * 2, cmap=cm.Blues, alpha=0.5,label='y pred (trained net)')
-        ax.plot_surface(xg, yg, y_true, vmin=0.0 * 2, cmap=cm.Reds, alpha=0.5,label='y true')
-        ax.set_xlabel('X1-axis')
-        ax.set_ylabel('X2-axis')
-        ax.set_zlabel('Y-axis')
-        ax.legend()
-        plt.show()'''
 
 def plotagem_1d_modelo(xf, func, y_pred_ext, x_train, y_train, x_val, y_val, loss_train, loss_val, func_label, path, number_epochs=4000):
     '''

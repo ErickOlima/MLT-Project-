@@ -31,8 +31,8 @@ def plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, func_label, path)
     ax2.set_xlabel("epoch")
     ax2.set_ylabel("loss")
     ax2.plot(range(4000), loss)
-    #fig.savefig(path)
-    #plt.show()
+    fig.savefig(path)
+    plt.close(fig)
 
 #dicionário com os erros de diversas situações
 dict_erros = {}
@@ -113,7 +113,7 @@ with tqdm.tqdm(total=len(activation_func_list) + len(neuronios_list)*(1+len(neur
         
         print(f"Tempo para função de ativação {activation_func}: {tm.time()-begin:.2f} segundos")
 
-#print(" ---- salvando erros ---- ")
-#dict_erros = json.dumps(dict_erros)
-#with open("Work\Ex1_graphs\Erros.txt", "w") as file:
-#    print(dict_erros, file=file)
+print(" ---- salvando erros ---- ")
+dict_erros = json.dumps(dict_erros)
+with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+    print(dict_erros, file=file)
