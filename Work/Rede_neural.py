@@ -5,7 +5,7 @@ import copy
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
-
+from mpl_toolkits.mplot3d import Axes3D
 
 class neural_net_interno(nn.Module):
     def __init__(self, activation_func = "ReLU"):
@@ -235,6 +235,76 @@ class neural_net_interno_4_hidden(neural_net_interno):
         x = self.fc5(x)
         return x
 
+class plt_plot_general():
+    def __init__(self, figsize = (8,24)):
+        self.fig = plt.figure(figsize=figsize)
+    
+    def plot_3d_surface(self, model, xa, xb, func, pos = [3, 1, 1], label_true = 'função a estimar', label_pred = "resultado da rede"):
+        self.model = model
+        self.xa = xa
+        self.xb = xb
+
+        #criando malha
+        grid_step = 50
+        xs = t.linspace(self.xa, self.xb, steps=grid_step)
+        ys = t.linspace(self.xa, self.xb, steps=grid_step)
+        xg,yg = t.meshgrid(xs, ys, indexing='xy')
+        s = xs.size(0)
+        xyg = t.zeros([s,s,2])
+
+        xyg[:,:,0] = xg
+        xyg[:,:,1] = yg
+
+        #fazendo predição da rede
+        y_pred = self.model.foward(xyg)
+        y_pred = t.squeeze(y_pred)
+
+        #definindo resultados exatos
+        y_true = func(xg, yg)
+
+        #plotando
+        ax = self.fig.add_subplot(pos[0], pos[1], pos[2], projection='3d')
+        ax.plot_surface(xg, yg, y_pred.detach().numpy(), cmap=cm.Blues, alpha=0.6,label=label_pred, linewidth=1, edgecolor='blue')
+        ax.plot_surface(xg, yg, y_true, cmap=cm.Reds, alpha=0.6,label=label_true, linewidth=1, edgecolor='red')
+        ax.set_xlabel('X1-axis')
+        ax.set_ylabel('X2-axis')
+        ax.set_zlabel('Y-axis')
+        ax.legend(loc = 'upper right')
+
+    def plot_erros(self, train_loss_sum_vec, val_loss_sum_vec, pos = [3, 1, 2]):
+        ax2 = self.fig.add_subplot(pos[0], pos[1], pos[2])
+        
+        ax2.plot(range(len(train_loss_sum_vec)), train_loss_sum_vec, label = "erro de treinamento")
+        ax2.plot(range(len(val_loss_sum_vec)), val_loss_sum_vec, label = "erro de validação")
+        ax2.set_yscale('log')
+        ax2.set_xscale('log')
+        ax2.grid(True)
+        ax2.legend(loc = 'upper left')
+
+    def plot_training_points(self, train_points, val_points, pos = [3, 1, 3]):
+        ax3 = self.fig.add_subplot(pos[0], pos[1], pos[2])
+
+        ax3.scatter(train_points[:,0], train_points[:,1], label = "pontos de treinamento")
+        ax3.scatter(val_points[:,0], val_points[:,1], label = "pontos de validação")
+        ax3.grid(True)
+        ax3.legend()
+
+    def show(self):
+        # Ajuste o layout para evitar sobreposição
+        self.fig.tight_layout()
+        #mostrandoo a figura
+        plt.show()
+
+    def save_fig(self, path):
+        # Ajuste o layout para evitar sobreposição
+        self.fig.tight_layout()
+        #salvamento
+        self.fig.savefig(path)
+
+    def close(self):
+        plt.close(self.fig)
+
+'''
 class plot_error():
     def __init__(self, train_loss_sum_vec, path):
         self.train_loss_sum_vec = train_loss_sum_vec
@@ -245,7 +315,6 @@ class plot_error():
         plt.xscale('log')
         plt.grid(True)
         plt.show()
-
 
 class plt_3d_surface():
     def __init__(self, model, xa, xb):
@@ -277,4 +346,37 @@ class plt_3d_surface():
         ax.set_ylabel('X2-axis')
         ax.set_zlabel('Y-axis')
         ax.legend()
-        plt.show()
+        plt.show()'''
+
+def plotagem_1d_modelo(xf, func, y_pred_ext, x_train, y_train, x_val, y_val, loss_train, loss_val, func_label, path, number_epochs=4000):
+    '''
+    xf: intervalo onde plotar a função
+    func: função exata
+    y_pred_ext: valores preditos pelo modelo para o intervalo de extrapolação
+    x_train: valores x de trainamento
+    y_train: valores y de treinamento
+    x_val: valores x de validação
+    y_val: valores y de validação
+    loss: vetor com as perdas
+    func_label: texto a associar com função exata
+    path: caminho e nome do arquivo para salvar
+    '''
+    fig, (ax, ax2) = plt.subplots(2,1, figsize = (7, 10))
+    ax.plot(xf, func(xf), label = func_label)
+    ax.plot(xf, y_pred_ext.detach().numpy(), label = "dados previstos")
+    ax.scatter(x_train, y_train, label = "valores de treinamento")
+    ax.scatter(x_val, y_val, label = "valores de validação")
+    ax.legend()
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    ax2.set_title("Evolução da perda")
+    ax2.set_xlabel("epoch")
+    ax2.set_ylabel("loss")
+    ax2.set_xscale("log")
+    ax2.set_yscale("log")
+    ax2.plot(range(number_epochs), loss_train, label = "Perda de treinamento")
+    ax2.plot(range(number_epochs), loss_val, label = "Perda de validação")
+    ax2.legend()
+    fig.savefig(path)
+    plt.close(fig)

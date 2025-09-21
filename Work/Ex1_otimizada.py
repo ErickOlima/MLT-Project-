@@ -6,68 +6,9 @@ import matplotlib.pyplot as plt
 import json
 import tqdm
 import Rede_neural as rn
+import Treinamenro_de_rede as tr
 
 print(" ---- definido parâmetros ---- ")
-def plotagem_1d_modelo(xf, func, y_pred_ext, x_train, y_train, x_val, y_val, loss_train, loss_val, func_label, path, number_epochs=4000):
-    '''
-    xf: intervalo onde plotar a função
-    func: função exata
-    y_pred_ext: valores preditos pelo modelo para o intervalo de extrapolação
-    x_train: valores x de trainamento
-    y_train: valores y de treinamento
-    x_val: valores x de validação
-    y_val: valores y de validação
-    loss: vetor com as perdas
-    func_label: texto a associar com função exata
-    path: caminho e nome do arquivo para salvar
-    '''
-    fig, (ax, ax2) = plt.subplots(2,1, figsize = (7, 10))
-    ax.plot(xf, func(xf), label = func_label)
-    ax.plot(xf, y_pred_ext.detach().numpy(), label = "dados previstos")
-    ax.scatter(x_train, y_train, label = "valores de treinamento")
-    ax.scatter(x_val, y_val, label = "valores de validação")
-    ax.legend()
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-
-    ax2.set_title("Evolução da perda")
-    ax2.set_xlabel("epoch")
-    ax2.set_ylabel("loss")
-    ax2.set_xscale("log")
-    ax2.set_yscale("log")
-    ax2.plot(range(number_epochs), loss_train, label = "Perda de treinamento")
-    ax2.plot(range(number_epochs), loss_val, label = "Perda de validação")
-    ax2.legend()
-    fig.savefig(path)
-    plt.close(fig)
-
-def processamento_agrupado(model_class, neuronios, activation_func, x_train, y_train, x_val, y_val,
-                            xf, func, error_func):
-    neuronios_tot = [1] + neuronios + [1]
-
-    #instanciaando a rede
-    model = model_class(neuronios_tot, activation_func, zerar_seed=1)
-
-    #realizando o treinamento
-    loss_train, loss_val, mini, maxi, savestate = model.treino_validacao(x_train, y_train, x_val, y_val)
-
-    # recuperando estado ótimo do modelo
-    model.load_state_dict(savestate)
-    
-    #determinando valores finais após treinamento
-    y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
-    
-    #estimando erro de extrapolação da função
-    error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
-
-    #plotando a resultados
-    text = f"Work\Ex1_graphs\{activation_func}"
-    for i in range(len(neuronios)):
-        text = text + f"_hidden{i+1}_{neuronios[i]}"
-    plotagem_1d_modelo(xf, func, y_pred, x_train, y_train, x_val, y_val, loss_train, loss_val, "y = x³",text)
-    
-    return error_measure
-
 
 #dicionário com os erros de diversas situações
 dict_erros = {}
@@ -112,8 +53,8 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             print(f" - com {neuronios_1} neuronios na 1ª camada")
 
             #treinando, plotando e definindo erros de extrapolação
-            error_measure = processamento_agrupado(rn.neural_net_interno_1_hidden, [neuronios_1], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_1_hidden, [neuronios_1], activation_func, 
+                                                      x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][neuronios_1] = error_measure
             
             # atualizando barra de progresso
@@ -149,8 +90,7 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
 
             #estimando erro de extrapolação da função
             error_old = error_measure
-            error_measure = processamento_agrupado(rn.neural_net_interno_1_hidden, [neuronios_1], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_1_hidden, [neuronios_1], activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][neuronios_1] = error_measure
 
             # cálculo do gradiente
@@ -167,15 +107,13 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             grad = []
             print(f" - com {neuronios[0]} neuronios na 1ª camada \n \t e {neuronios[1]} neuronios na 2ª camada")
             
-            error_measure_old = processamento_agrupado(rn.neural_net_interno_2_hidden, neuronios, activation_func, 
-                                                       x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure_old = tr.processamento_agrupado(rn.neural_net_interno_2_hidden, neuronios, activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]}"] = error_measure_old
             
             #rodadndo para determinação da derivada do número de neuronios na 1ª camada
             print(f" - com {neuronios[0] + passo_centrado} neuronios na 1ª camada \n \t e {neuronios[1]} neuronios na 2ª camada")
         
-            error_measure = processamento_agrupado(rn.neural_net_interno_2_hidden, [neuronios[0] + passo_centrado, neuronios[1]], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_2_hidden, [neuronios[0] + passo_centrado, neuronios[1]], activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]+passo_centrado},{neuronios[1]}"] = error_measure
             
             #determinado derivada
@@ -184,8 +122,7 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             #rodadndo para determinação da derivada do número de neuronios na 2ª camada
             print(f" - com {neuronios[0]} neuronios na 1ª camada \n \t e {neuronios[1] + passo_centrado} neuronios na 2ª camada")
             
-            error_measure = processamento_agrupado(rn.neural_net_interno_2_hidden, [neuronios[0], neuronios[1] + passo_centrado], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_2_hidden, [neuronios[0], neuronios[1] + passo_centrado], activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]+passo_centrado}"] = error_measure
 
             #determinado derivada
@@ -213,15 +150,13 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             grad = []
             print(f" - com {neuronios[0]} neuronios na 1ª camada; \n \t {neuronios[1]} neuronios na 2ª camada; \n \t e {neuronios[2]} neuronios na 3ª camada")
             
-            error_measure_old = processamento_agrupado(rn.neural_net_interno_3_hidden, neuronios, activation_func, 
-                                                       x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure_old = tr.processamento_agrupado(rn.neural_net_interno_3_hidden, neuronios, activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]},{neuronios[2]}"] = error_measure_old
             
             #rodadndo para determinação da derivada do número de neuronios na 1ª camada
             print(f" - com {neuronios[0]+passo_centrado} neuronios na 1ª camada; \n \t {neuronios[1]} neuronios na 2ª camada; \n \t e {neuronios[2]} neuronios na 3ª camada")
         
-            error_measure = processamento_agrupado(rn.neural_net_interno_3_hidden, [neuronios[0] + passo_centrado, neuronios[1], neuronios[2]], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_3_hidden, [neuronios[0] + passo_centrado, neuronios[1], neuronios[2]], activation_func,  x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]+passo_centrado},{neuronios[1]},{neuronios[2]}"] = error_measure
             
             #determinado derivada
@@ -230,8 +165,7 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             #rodadndo para determinação da derivada do número de neuronios na 2ª camada
             print(f" - com {neuronios[0]} neuronios na 1ª camada; \n \t {neuronios[1] + passo_centrado} neuronios na 2ª camada; \n \t e {neuronios[2]} neuronios na 3ª camada")
         
-            error_measure = processamento_agrupado(rn.neural_net_interno_3_hidden, [neuronios[0], neuronios[1] + passo_centrado, neuronios[2]], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_3_hidden, [neuronios[0], neuronios[1] + passo_centrado, neuronios[2]], activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]+passo_centrado},{neuronios[2]}"] = error_measure
 
             #determinado derivada
@@ -240,8 +174,7 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             #rodadndo para determinação da derivada do número de neuronios na 3ª camada
             print(f" - com {neuronios[0]} neuronios na 1ª camada; \n \t {neuronios[1]} neuronios na 2ª camada; \n \t e {neuronios[2] + passo_centrado} neuronios na 3ª camada")
         
-            error_measure = processamento_agrupado(rn.neural_net_interno_3_hidden, [neuronios[0], neuronios[1], neuronios[2] + passo_centrado], activation_func, 
-                                                   x_train, y_train, x_val, y_val, xf, func, error_func)
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_3_hidden, [neuronios[0], neuronios[1], neuronios[2] + passo_centrado], activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]},{neuronios[2]+ passo_centrado}"] = error_measure
 
             #determinado derivada

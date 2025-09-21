@@ -71,7 +71,7 @@ with tqdm.tqdm(total=len(activation_func_list) + len(neuronios_list)*(1+len(neur
 
             y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
 
-            error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
+            error_measure = error_func(t.tensor(func(xf), dtype= t.float32), y_pred).item()
             dict_erros[activation_func][neuronios_1] = error_measure
 
             plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
