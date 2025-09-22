@@ -70,7 +70,8 @@ with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuron
                     pbar.update(1)
                 
         for erros in dict_erros[activation_func].items():
-            print(f"Função de Ativação: {activation_func}, Neurônios: {erros[0]}, Erro: {erros[1]}")
+            if erros[1] == min(dict_erros[activation_func].values()):
+                print(f"Função de Ativação: {activation_func}, Neurônios: {erros[0]}, Erro: {erros[1]}")
         
         print(f"Tempo para função de ativação {activation_func}: {tm.time()-begin:.2f} segundos")
 
