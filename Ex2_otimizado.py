@@ -12,17 +12,16 @@ import sys
 
 print(" ---- definido parâmetros ---- ")
 #Pasta para salvar os reseultados
-origin_path = "Ex4_graphs"
+origin_path = "Ex2_graphs"
 
 #dicionário com os erros de diversas situações
 dict_erros = {}
 
 #função
-func = lambda x_1,x_2: x_1 ** 2 + x_2 ** 2 -10*(t.cos(t.pi*x_1) + t.cos(t.pi*x_2))
-
+func = lambda x_1,x_2: 3*(1-x_1)**2*np.exp(-x_1**2 - (x_2 + 1)**2) - 10*(x_1/5 - x_1**3 - x_2**5)*np.exp(-x_1**2 - x_2**2) - 1/3*np.exp(-(x_1 + 1)**2 - x_2**2)
 #amostras 
-number_samples = 30
-xa, xb = -5, 5
+number_samples = 20
+xa, xb = -4, 4
 t.manual_seed(0)
 
 input_size = 2
@@ -37,14 +36,14 @@ y_val = func(x_val[:,0], x_val[:,1])
 # neuronios e funções de  ativação a testar
 activation_func_list = ("ReLU", "sigmoid", "tanh") # funções de ativação a testar
 n_neuronios_inicial = 30 # chute inicial de neuronios
-passo_centrado = 1 # passo da diferenças finitas
-n_iterations = 20 # número de iterações
-n_max_layers = 6 # número máximo  de layer
+passo_centrado = 1 # passo da dife renças finitas
+n_iterations = 10 # número de iterações
+n_layers = (2, 3) # número máximo  de layer
 n_max_neuronios_per_layer = 1000 # número máximo  de neuronios por camada
 cl = [rn.neural_net_interno_2_hidden, rn.neural_net_interno_3_hidden, rn.neural_net_interno_4_hidden, rn.neural_net_interno_5_hidden, rn.neural_net_interno_6_hidden]
 
 print(" ---- treinando e validando a rede ---- ")
-with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pbar:
+with tqdm.tqdm(total=len(activation_func_list)*n_iterations*(len(n_layers)+1)) as pbar:
 
     for activation_func in activation_func_list:
         dict_erros[activation_func] = {}
@@ -100,14 +99,13 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             
             # atualizando barra de progresso
             pbar.update(1)
-        
 
         # 2 - max hidden layers
-        for n_l in range(2, n_max_layers+1):
+        for n_l in n_layers:
             print(f" ---- análise para uma rede com {n_l} camadas ocultas com a função de ativação {activation_func} ---- ")
             model_class = cl[n_l-2]
             # determinação do chute inicial
-            neuronios = [n_neuronios_inicial, n_neuronios_inicial, n_neuronios_inicial, n_neuronios_inicial]
+            neuronios = [n_neuronios_inicial for i in range(n_l)]
 
             for i in range(n_iterations):
                 grad = []
@@ -170,8 +168,8 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
 
                 # atualizando barra de progresso
                 pbar.update(1)
-
+        
 print(" ---- salvando erros ---- ")
 dict_erros = json.dumps(dict_erros)
-with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+with open(f"Work\{origin_path}\Erros2.txt", "w") as file:
     print(dict_erros, file=file)

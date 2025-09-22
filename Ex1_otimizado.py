@@ -196,5 +196,5 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
 
 print(" ---- salvando erros ---- ")
 dict_erros = json.dumps(dict_erros)
-with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+with open("Work\Ex1_graphs\Erros2.txt", "w") as file:
     print(dict_erros, file=file)

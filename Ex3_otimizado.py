@@ -12,16 +12,17 @@ import sys
 
 print(" ---- definido parâmetros ---- ")
 #Pasta para salvar os reseultados
-origin_path = "Ex2_graphs"
+origin_path = "Ex3_graphs"
 
 #dicionário com os erros de diversas situações
 dict_erros = {}
 
 #função
-func = lambda x_1,x_2: 3*(1-x_1)**2*np.exp(-x_1**2 - (x_2 + 1)**2) - 10*(x_1/5 - x_1**3 - x_2**5)*np.exp(-x_1**2 - x_2**2) - 1/3*np.exp(-(x_1 + 1)**2 - x_2**2)
+func = lambda x_1,x_2: t.sin(x_1+ t.cos(x_2))
+
 #amostras 
-number_samples = 20
-xa, xb = -4, 4
+number_samples = 15
+xa, xb = -3, 3
 t.manual_seed(0)
 
 input_size = 2
@@ -37,8 +38,8 @@ y_val = func(x_val[:,0], x_val[:,1])
 activation_func_list = ("ReLU", "sigmoid", "tanh") # funções de ativação a testar
 n_neuronios_inicial = 30 # chute inicial de neuronios
 passo_centrado = 1 # passo da diferenças finitas
-n_iterations = 20 # número de iterações
-n_max_layers = 6 # número máximo  de layer
+n_iterations = 10 # número de iterações
+n_max_layers = 3 # número máximo  de layer
 n_max_neuronios_per_layer = 1000 # número máximo  de neuronios por camada
 cl = [rn.neural_net_interno_2_hidden, rn.neural_net_interno_3_hidden, rn.neural_net_interno_4_hidden, rn.neural_net_interno_5_hidden, rn.neural_net_interno_6_hidden]
 
@@ -106,7 +107,7 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
             print(f" ---- análise para uma rede com {n_l} camadas ocultas com a função de ativação {activation_func} ---- ")
             model_class = cl[n_l-2]
             # determinação do chute inicial
-            neuronios = [n_neuronios_inicial, n_neuronios_inicial, n_neuronios_inicial, n_neuronios_inicial]
+            neuronios = [n_neuronios_inicial for i in range(n_l)]
 
             for i in range(n_iterations):
                 grad = []
@@ -172,5 +173,5 @@ with tqdm.tqdm(total=len(activation_func_list)*n_iterations*n_max_layers) as pba
 
 print(" ---- salvando erros ---- ")
 dict_erros = json.dumps(dict_erros)
-with open("Work\Ex1_graphs\Erros.txt", "w") as file:
+with open(f"Work\{origin_path}\Erros2.txt", "w") as file:
     print(dict_erros, file=file)

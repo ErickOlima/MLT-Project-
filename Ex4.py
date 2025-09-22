@@ -8,20 +8,21 @@ import tqdm
 import Rede_neural as rn
 import time as tm
 import Treinamenro_de_rede as tr
-import sys
+
 
 print(" ---- definido parâmetros ---- ")
 #Pasta para salvar os reseultados
-origin_path = "Ex2_graphs"
+origin_path = "Ex4_graphs"
 
 #dicionário com os erros de diversas situações
 dict_erros = {}
 
 #função
-func = lambda x_1,x_2: 3*(1-x_1)**2*np.exp(-x_1**2 - (x_2 + 1)**2) - 10*(x_1/5 - x_1**3 - x_2**5)*np.exp(-x_1**2 - x_2**2) - 1/3*np.exp(-(x_1 + 1)**2 - x_2**2)
+func = lambda x_1,x_2: x_1 ** 2 + x_2 ** 2 -10*(t.cos(t.pi*x_1) + t.cos(t.pi*x_2))
+
 #amostras 
-number_samples = 20
-xa, xb = -4, 4
+number_samples = 30
+xa, xb = -5, 5
 t.manual_seed(0)
 
 input_size = 2
@@ -71,7 +72,6 @@ with tqdm.tqdm(total=len(activation_func_list)*len(neuronios_list)*(1+len(neuron
         for erros in dict_erros[activation_func].items():
             if erros[1] == min(dict_erros[activation_func].values()):
                 print(f" Função de Ativação: {activation_func}, Neurônios: {erros[0]}, Erro: {erros[1]}")
-
         print(f"Tempo para função de ativação {activation_func}: {tm.time()-begin:.2f} segundos")
 
     print(" ---- salvando erros ---- ")

@@ -57,7 +57,7 @@ activation_func_list = ("ReLU", "sigmoid", "tanh")
 neuronios_list = (5, 10, 15, 20, 25, 30)
 
 print(" ---- treinando e validando a rede ---- ")
-with tqdm.tqdm(total=len(activation_func_list) + len(neuronios_list)*(1+len(neuronios_list)*(1+len(neuronios_list)))) as pbar:
+with tqdm.tqdm(total=len(activation_func_list) * len(neuronios_list)*(1+len(neuronios_list)*(1+len(neuronios_list)))) as pbar:
     
     # error_func = lambda y_true, y_pred = np.sum((func(xf)-y_pred.detach().numpy())**2)
     for activation_func in activation_func_list:
