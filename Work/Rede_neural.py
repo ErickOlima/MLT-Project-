@@ -484,5 +484,5 @@ def plotagem_1d_modelo(xf, func, y_pred_ext, x_train, y_train, x_val, y_val, los
     ax2.plot(range(number_epochs), loss_train, label = "Perda de treinamento")
     ax2.plot(range(number_epochs), loss_val, label = "Perda de validação")
     ax2.legend()
-    fig.savefig(path)
+    #fig.savefig(path)
     plt.close(fig)
