@@ -312,10 +312,10 @@ class neural_net_interno_6_hidden(neural_net_interno):
     
 class plt_plot_general():
     '''classe generica para plotagem de gráficos'''
-    def __init__(self, figsize = (8,24)):
+    def __init__(self, figsize = (8,30)):
         self.fig = plt.figure(figsize=figsize)
     
-    def plot_3d_surface(self, model, xa, xb, func, pos = [3, 1, 1], label_true = 'função a estimar', label_pred = "resultado da rede"):
+    def plot_3d_surface(self, model, xa, xb, func, pos = [4, 1, 1], pos_est = [4, 1, 2], label_true = 'função a estimar', label_pred = "resultado da rede"):
         self.model = model
         self.xa = xa
         self.xb = xb
@@ -340,15 +340,21 @@ class plt_plot_general():
 
         #plotando
         ax = self.fig.add_subplot(pos[0], pos[1], pos[2], projection='3d')
+        ax4 = self.fig.add_subplot(pos_est[0], pos_est[1], pos_est[2], projection='3d')
         ax.plot_surface(xg, yg, y_pred.detach().numpy(), cmap=cm.Blues, alpha=0.6,label=label_pred, linewidth=1, edgecolor='blue')
         ax.plot_surface(xg, yg, y_true, cmap=cm.Reds, alpha=0.6,label=label_true, linewidth=1, edgecolor='red')
+        ax4.plot_surface(xg, yg, y_pred.detach().numpy(), cmap=cm.Blues, alpha=0.6,label=label_pred, linewidth=1, edgecolor='blue')
         ax.set_xlabel('X1-axis')
         ax.set_ylabel('X2-axis')
         ax.set_zlabel('Y-axis')
         ax.legend(loc = 'upper right')
+        ax4.set_xlabel('X1-axis')
+        ax4.set_ylabel('X2-axis')
+        ax4.set_zlabel('Y-axis')
+        ax4.legend(loc = 'upper right')
         
 
-    def plot_erros(self, train_loss_sum_vec, val_loss_sum_vec, pos = [3, 1, 2]):
+    def plot_erros(self, train_loss_sum_vec, val_loss_sum_vec, pos = [4, 1, 3]):
         ax2 = self.fig.add_subplot(pos[0], pos[1], pos[2])
         
         ax2.plot(range(len(train_loss_sum_vec)), train_loss_sum_vec, label = "erro de treinamento")
@@ -361,7 +367,7 @@ class plt_plot_general():
         ax2.legend(loc = 'upper left')
         ax2.grid(True)
 
-    def plot_training_points(self, train_points, val_points, pos = [3, 1, 3]):
+    def plot_training_points(self, train_points, val_points, pos = [4, 1, 4]):
         ax3 = self.fig.add_subplot(pos[0], pos[1], pos[2])
 
         ax3.scatter(train_points[:,0], train_points[:,1], label = "pontos de treinamento")
