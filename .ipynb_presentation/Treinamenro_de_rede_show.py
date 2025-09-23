@@ -4,7 +4,7 @@ import torch as t
 import Rede_neural as rn
 
 def processamento_agrupado_2d(model_class, neuronios, activation_func, x_train, y_train, x_val, y_val,
-                            func, xa, xb, origin_path):
+                            func, xa, xb):
     neuronios_tot = [2] + neuronios + [1]
 
     #instanciaando a rede
@@ -17,15 +17,11 @@ def processamento_agrupado_2d(model_class, neuronios, activation_func, x_train, 
     model.load_state_dict(savestate)
     
     # plotando os dados
-    path = f"Work\{origin_path}\{activation_func}"
-    for i in range(len(neuronios)):
-        path = path + f"_hidden{i+1}_{neuronios[i]}"
-
     fig = rn.plt_plot_general()
     fig.plot_3d_surface(model, xa, xb, func)
     fig.plot_erros(loss_train, loss_val)
     fig.plot_training_points(x_train, x_val)
-    fig.show(path)
+    fig.show()
 
     #retornando  erro da avaliação
     return min_loss_val

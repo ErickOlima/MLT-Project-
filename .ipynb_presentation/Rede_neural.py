@@ -355,6 +355,8 @@ class plt_plot_general():
         ax2.plot(range(len(val_loss_sum_vec)), val_loss_sum_vec, label = "erro de validação")
         ax2.set_yscale('log')
         ax2.set_xscale('log')
+        ax2.set_xlabel('Epoca')
+        ax2.set_ylabel('Perda')
         ax2.grid(True)
         ax2.legend(loc = 'upper left')
         ax2.grid(True)
@@ -364,6 +366,8 @@ class plt_plot_general():
 
         ax3.scatter(train_points[:,0], train_points[:,1], label = "pontos de treinamento")
         ax3.scatter(val_points[:,0], val_points[:,1], label = "pontos de validação")
+        ax3.set_xlabel('x1')
+        ax3.set_ylabel('x2')
         ax3.grid(True)
         ax3.legend()
         ax3.grid(True)
