@@ -302,6 +302,85 @@ class neural_net_interno_6_hidden(neural_net_interno):
         x = self.fc7(x)
         return x
     
+class neural_net_interno_7_hidden(neural_net_interno):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
+        '''
+        sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
+        activation_func : função de ativação aplicada interiormente
+        '''
+        super().__init__(activation_func)
+        
+        if zerar_seed:
+            t.manual_seed(0)
+         
+        self.fc1 = nn.Linear(sizes[0], sizes[1])
+        self.fc2 = nn.Linear(sizes[1], sizes[2])
+        self.fc3 = nn.Linear(sizes[2], sizes[3])
+        self.fc4 = nn.Linear(sizes[3], sizes[4])
+        self.fc5 = nn.Linear(sizes[4], sizes[5])
+        self.fc6 = nn.Linear(sizes[5], sizes[6])
+        self.fc7 = nn.Linear(sizes[6], sizes[7])
+        self.fc8 = nn.Linear(sizes[7], sizes[8])
+
+    def foward(self, x):
+        x = self.fc1(x)
+        x = self.func(x)
+        x = self.fc2(x)
+        x = self.func(x)
+        x = self.fc3(x)
+        x = self.func(x)
+        x = self.fc4(x)
+        x = self.func(x)
+        x = self.fc5(x)
+        x = self.func(x)
+        x = self.fc6(x)
+        x = self.func(x)
+        x = self.fc7(x)
+        x = self.func(x)
+        x = self.fc8(x)
+        return x
+
+class neural_net_interno_8_hidden(neural_net_interno):
+    def __init__(self, sizes:list, activation_func = "ReLU", zerar_seed=False):
+        '''
+        sizes : [input_size, hidden_size1, hidden_size2, ..., output_size]
+        activation_func : função de ativação aplicada interiormente
+        '''
+        super().__init__(activation_func)
+        
+        if zerar_seed:
+            t.manual_seed(0)
+         
+        self.fc1 = nn.Linear(sizes[0], sizes[1])
+        self.fc2 = nn.Linear(sizes[1], sizes[2])
+        self.fc3 = nn.Linear(sizes[2], sizes[3])
+        self.fc4 = nn.Linear(sizes[3], sizes[4])
+        self.fc5 = nn.Linear(sizes[4], sizes[5])
+        self.fc6 = nn.Linear(sizes[5], sizes[6])
+        self.fc7 = nn.Linear(sizes[6], sizes[7])
+        self.fc8 = nn.Linear(sizes[7], sizes[8])
+        self.fc9 = nn.Linear(sizes[8], sizes[9])
+
+    def foward(self, x):
+        x = self.fc1(x)
+        x = self.func(x)
+        x = self.fc2(x)
+        x = self.func(x)
+        x = self.fc3(x)
+        x = self.func(x)
+        x = self.fc4(x)
+        x = self.func(x)
+        x = self.fc5(x)
+        x = self.func(x)
+        x = self.fc6(x)
+        x = self.func(x)
+        x = self.fc7(x)
+        x = self.func(x)
+        x = self.fc8(x)
+        x = self.func(x)
+        x = self.fc9(x)
+        return x
+    
 class plt_plot_general():
     def __init__(self, figsize = (8,24)):
         self.fig = plt.figure(figsize=figsize)

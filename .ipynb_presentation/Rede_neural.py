@@ -85,6 +85,7 @@ class neural_net_interno(nn.Module):
             t.manual_seed(seed)
 
         if optimize == 'Adam':
+            #definindo otimizador
             optimizer = optim.Adam(self.parameters(), lr = learning_rate)
 
             for epoch in range(number_epochs):
@@ -99,7 +100,7 @@ class neural_net_interno(nn.Module):
                     loss = loss_func(y_pred, y_train.squeeze())
                     train_loss_sum += loss.item()
 
-                    #backward automatic derivation
+                    #derivação automática reversa
                     optimizer.zero_grad() #zera os valores .grad calculados
                     loss.backward() # cálculo do gradiente
                     optimizer.step() #alteras os valores de pesos e bias
@@ -123,18 +124,25 @@ class neural_net_interno(nn.Module):
                 elif tipo == "Minibatch":
                     raise NameError("tipo não implementado")
                 
+                #salvando valores das perdas
                 train_loss_sum_vec.append(train_loss_sum)
                 val_loss_sum_vec.append(val_loss_sum)
+
+                #salvando perda mínima de validação
                 if val_loss_min > val_loss_sum:
                     val_loss_min = val_loss_sum
+
+                    #salvando estado da rede com mínima perda de validação
                     savestate = copy.deepcopy(self.state_dict())
 
+                #salvando perda mínima de validação
                 if val_loss_max < val_loss_sum:
                     val_loss_max = val_loss_sum
         else:
             # talvez definir para com lr fixo aqui?
             raise NameError("otimizador não definido")
         
+        # retornando vetores com perdas, valores máximos e mínimos de perdas e o estado ótimo da rede para o intervalo de validação
         return train_loss_sum_vec, val_loss_sum_vec, val_loss_min, val_loss_max, savestate
     
 class neural_net_interno_1_hidden(neural_net_interno):
@@ -303,6 +311,7 @@ class neural_net_interno_6_hidden(neural_net_interno):
         return x
     
 class plt_plot_general():
+    '''classe generica para plotagem de gráficos'''
     def __init__(self, figsize = (8,24)):
         self.fig = plt.figure(figsize=figsize)
     
@@ -407,3 +416,36 @@ def plotagem_1d_modelo(xf, func, y_pred_ext, x_train, y_train, x_val, y_val, los
     ax2.legend()
     fig.savefig(path)
     plt.close(fig)
+
+def plotagem_1d_modelo_show(xf, func, y_pred_ext, x_train, y_train, x_val, y_val, loss_train, loss_val, func_label, path, number_epochs=4000):
+    '''
+    xf: intervalo onde plotar a função
+    func: função exata
+    y_pred_ext: valores preditos pelo modelo para o intervalo de extrapolação
+    x_train: valores x de trainamento
+    y_train: valores y de treinamento
+    x_val: valores x de validação
+    y_val: valores y de validação
+    loss: vetor com as perdas
+    func_label: texto a associar com função exata
+    path: caminho e nome do arquivo para salvar
+    '''
+    fig, (ax, ax2) = plt.subplots(2,1, figsize = (7, 10))
+    ax.plot(xf, func(xf), label = func_label)
+    ax.plot(xf, y_pred_ext.detach().numpy(), label = "dados previstos")
+    ax.scatter(x_train, y_train, label = "valores de treinamento")
+    ax.scatter(x_val, y_val, label = "valores de validação")
+    ax.legend()
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    ax2.set_title("Evolução da perda")
+    ax2.set_xlabel("epoch")
+    ax2.set_ylabel("loss")
+    ax2.set_xscale("log")
+    ax2.set_yscale("log")
+    ax2.plot(range(number_epochs), loss_train, label = "Perda de treinamento")
+    ax2.plot(range(number_epochs), loss_val, label = "Perda de validação")
+    ax2.grid(True)
+    ax2.legend()
+    fig.show()
