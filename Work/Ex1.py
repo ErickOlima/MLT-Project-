@@ -7,6 +7,7 @@ import json
 import tqdm
 import Rede_neural as rn
 import time as tm
+import Treinamenro_de_rede as tr
 
 print(" ---- definido parâmetros ---- ")
 def plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, func_label, path):
@@ -69,46 +70,36 @@ with tqdm.tqdm(total=len(activation_func_list) * len(neuronios_list)*(1+len(neur
 
         # 1 hidden layer
         for neuronios_1 in (5, 10, 15, 20, 25, 30):
-            model = rn.neural_net_interno_1_hidden([1, neuronios_1, 1], activation_func, zerar_seed=1) # uma camada interna de 20]
-            loss = model.treino(x_true, y_true)
+            print(f" - com {neuronios_1} neuronios na 1ª camada")
 
-            y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
-
-            error_measure = error_func(t.tensor(func(xf), dtype= t.float32), y_pred).item()
+            #treinando, plotando e definindo erros de extrapolação
+            error_measure = tr.processamento_agrupado(rn.neural_net_interno_1_hidden, [neuronios_1], activation_func, 
+                                                        x_train, y_train, x_val, y_val, xf, func, error_func)
             dict_erros[activation_func][neuronios_1] = error_measure
 
-            plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
-                                f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}")
+            # atualizando barra de progresso
             pbar.update(1)
-
+           
         # 2 hidden layer
         for neuronios_1 in neuronios_list:
             for neuronios_2 in neuronios_list:
-                model = rn.neural_net_interno_2_hidden([1, neuronios_1, neuronios_2, 1], activation_func) # uma camada interna de 20]
-                loss = model.treino(x_true, y_true)
+                neuronios = [neuronios_1, neuronios_2]
+                print(f" - com {neuronios[0]} neuronios na 1ª camada \n \t e {neuronios[1]} neuronios na 2ª camada")
+                
+                error_measure = tr.processamento_agrupado(rn.neural_net_interno_2_hidden, neuronios, activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
+                dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]}"] = error_measure
 
-                y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
-
-                error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
-                dict_erros[activation_func][f"{neuronios_1},{neuronios_2}"] = error_measure
-
-                plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
-                                    f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}")
                 pbar.update(1)
+
         # 3 hidden layer
         for neuronios_1 in neuronios_list:
             for neuronios_2 in neuronios_list:
                 for neuronios_3 in neuronios_list:
-                    model = rn.neural_net_interno_3_hidden([1, neuronios_1, neuronios_2, neuronios_3, 1], activation_func) # uma camada interna de 20]
-                    loss = model.treino(x_true, y_true)
-
-                    y_pred = model.foward(t.tensor(np.array([xf]).T, dtype = t.float32)).squeeze()
-
-                    error_measure = error_func(t.tensor(func(xf), dtype= t.float64), y_pred).item()
-                    dict_erros[activation_func][f"{neuronios_1},{neuronios_2},{neuronios_3}"] = error_measure
-
-                    plotagem_1d_modelo(xf, func, x_true, y_pred, y_true, loss, "y = x³",
-                                        f"Work\Ex1_graphs\{activation_func}_hidden1_{neuronios_1}_hidden2_{neuronios_2}_hidden3_{neuronios_3}")
+                    print(f" - com {neuronios[0]} neuronios na 1ª camada; \n \t {neuronios[1]} neuronios na 2ª camada; \n \t e {neuronios[2]} neuronios na 3ª camada")
+                    
+                    error_measure_old = tr.processamento_agrupado(rn.neural_net_interno_3_hidden, neuronios, activation_func, x_train, y_train, x_val, y_val, xf, func, error_func)
+                    dict_erros[activation_func][f"{neuronios[0]},{neuronios[1]},{neuronios[2]}"] = error_measure_old
+                    
                     pbar.update(1)
 
         for erros in dict_erros[activation_func].items():

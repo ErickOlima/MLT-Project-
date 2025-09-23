@@ -11,6 +11,6 @@ A melhor aproximação para a ReLU é com 5,5,5 com um erro de: 0.03979511559009
 A melhor aproximação para a sigmoid é com 5,5,5 com um erro de: 0.0715784877538681
 A melhor aproximação para a tanh é com 30,15,5 com um erro de: 0.04969685152173042
  ---- Ex4 ---- 
-A melhor aproximação para a ReLU é com 8,35 com um erro de: 121.01990509033203
+A melhor aproximação para a ReLU é com 10,52,19,71,44,58 com um erro de: 113.03744506835938
 A melhor aproximação para a sigmoid é com 18,4 com um erro de: 101.32859802246094
-A melhor aproximação para a tanh é com 33,27,31 com um erro de: 108.68450164794922
+A melhor aproximação para a tanh é com 95,168,177,47,79,994 com um erro de: 97.34630584716797
